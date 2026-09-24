@@ -59,7 +59,7 @@ app  <--tail---  agent/events.jsonl   (steps, tool calls, memory writes, metrics
 | Task | Where it lives | Notes |
 |---|---|---|
 | Model inference | `runtime/gemma4_hybrid_runner.cpp` | NPU W8A16 vision + MNN Q4 text. Text turns reuse the KV cache through MNN's prompt cache, so only the new suffix is prefilled |
-| Memory | `runtime/agent/agent_memory.cpp` | Bounded on-disk store (facts, preferences, notes, episode summaries) with BM25, CJK bigrams, recency/importance decay, near-duplicate merging, pruning and slot-based updates: "记住我叫李雷" followed by "改成记住我叫杨雷" replaces that record instead of keeping both |
+| Memory | `runtime/agent/agent_memory.cpp` | Bounded on-disk store (facts, preferences, notes, episode summaries) with BM25, CJK bigrams, recency/importance decay, near-duplicate merging, pruning and slot-based updates: "记住我住在杭州" followed by "改成记住我住在上海" replaces that record instead of keeping both |
 | Planning | `runtime/agent/agent_planner.cpp` | Plan state machine driven by `make_plan`/`update_plan`; implicit steps are recorded too, so the UI always shows what happened |
 | Tools | `runtime/agent/agent_tools.cpp` | 12 native tools (calculator, now, unit_convert, text_stats, remember, recall, forget, search_history, image_info, device_info, make_plan, update_plan) plus alias resolution for the names a 2B model invents |
 | History | `runtime/agent/agent_session.cpp` | Per-session append-only transcript, rolling summary, compaction, session list / rename / delete |
@@ -256,7 +256,7 @@ first match:
 
 1. Slot conflict - `extract_slot()` maps the leading pattern to a key (`name`,
    `city`, `job`, `preference`). A different value under the same kind and key
-   replaces the old record, so "记住我叫李雷" followed by "改成记住我叫杨雷" leaves
+   replaces the old record, so "记住我住在杭州" followed by "改成记住我住在上海" leaves
    one record.
 2. Explicit correction - a record flagged `correction` replaces the most similar
    record of its kind once the token Jaccard similarity reaches 0.2, even when

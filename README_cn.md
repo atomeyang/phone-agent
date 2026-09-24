@@ -41,7 +41,7 @@ app  <--tail---  agent/events.jsonl   (steps, tool calls, memory writes, metrics
 | 职责 | 位置 | 说明 |
 |---|---|---|
 | 模型推理 | `runtime/gemma4_hybrid_runner.cpp` | NPU W8A16 视觉 + MNN Q4 文本。文本轮次通过 MNN 的 prompt cache 复用 KV，只预填充新增的那段 |
-| 记忆 | `runtime/agent/agent_memory.cpp` | 有界磁盘存储（事实、偏好、笔记、episode 摘要），带 BM25、中文 bigram、时间/重要性衰减、近似重复合并、剪枝，以及按槽位更新："记住我叫李雷" 之后 "改成记住我叫杨雷" 会替换该记录，而不是两条并存 |
+| 记忆 | `runtime/agent/agent_memory.cpp` | 有界磁盘存储（事实、偏好、笔记、episode 摘要），带 BM25、中文 bigram、时间/重要性衰减、近似重复合并、剪枝，以及按槽位更新："记住我住在杭州" 之后 "改成记住我住在上海" 会替换该记录，而不是两条并存 |
 | 规划 | `runtime/agent/agent_planner.cpp` | 由 `make_plan`/`update_plan` 驱动的计划状态机。运行时还会记录隐式步骤，所以 UI 总能看到实际发生了什么 |
 | 工具 | `runtime/agent/agent_tools.cpp` | 12 个原生工具（calculator、now、unit_convert、text_stats、remember、recall、forget、search_history、image_info、device_info、make_plan、update_plan），并为 2B 模型自创的工具名做别名解析 |
 | 历史 | `runtime/agent/agent_session.cpp` | 每会话 append-only 记录、滚动摘要、压缩、会话列表/重命名/删除 |
@@ -146,7 +146,7 @@ helpers/tools/run_agent_live_probe.sh       # real Q4 weights on x86: protocol, 
 
 去重。`MemoryStore::add()` 按顺序试三条规则，命中第一条就停：
 
-1. 槽位冲突：`extract_slot()` 把开头模式映射为 key（`name`、`city`、`job`、`preference`）。同 kind、同 key 下出现不同的值就替换旧记录，所以 "记住我叫李雷" 接 "改成记住我叫杨雷" 之后只剩一条。
+1. 槽位冲突：`extract_slot()` 把开头模式映射为 key（`name`、`city`、`job`、`preference`）。同 kind、同 key 下出现不同的值就替换旧记录，所以 "记住我住在杭州" 接 "改成记住我住在上海" 之后只剩一条。
 2. 显式修正：带 `correction` 标记的记录，在 token Jaccard 相似度到 0.2 时就替换同 kind 里最相似的那条，即使措辞变化很大也成立。
 3. 近似重复：Jaccard >= 0.72 时并入已有记录（取更长的文本、合并 tag、抬高 importance、增加访问计数）。
 
