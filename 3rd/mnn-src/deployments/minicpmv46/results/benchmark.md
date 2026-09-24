@@ -1,6 +1,6 @@
 # MiniCPM-V 4.6 Android Deployment Results
 
-Test device: Infinix X6877, MT6899, Android 16. All Android commands used the
+Test device: MTK 8400 platform, MT6899, Android 16. All Android commands used the
 Windows SDK `adb.exe`. The test used `test.jpg`, the official one-tile
 preprocessing path, 86 prompt tokens, 63 visual tokens, and greedy decoding.
 The hybrid and MNN runs generated 64 tokens; the full-NPU run generated 16.

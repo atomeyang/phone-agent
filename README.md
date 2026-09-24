@@ -2,7 +2,7 @@
 
 [中文](README_cn.md) | **English**
 
-Hybrid on-device deployment of `gemma-4-E2B-it` for the Infinix X6877
+Hybrid on-device deployment of `gemma-4-E2B-it` for the MTK 8400 platform
 (`ro.soc.model=MT6899`, Dimensity 8400, Android 16, adb root):
 
 | Stage | Where | Recipe |
@@ -15,9 +15,9 @@ Hybrid on-device deployment of `gemma-4-E2B-it` for the Infinix X6877
 | Agent: inference, memory, planning, tools, history | CPU, same process as the runner | `runtime/agent/` |
 | UI | Android app | `Gemma 4 D8400` |
 
-<img src="helpers/docs/images/mobile-phone-agent.jpg" alt="The on-device agent running on the target phone (Infinix X6877)" width="330">
+<img src="helpers/docs/images/mobile-phone-agent.jpg" alt="The on-device agent running on the target phone (MTK 8400 platform)" width="330">
 
-*The shipped agent on the Infinix X6877: one arm64 process owns the model, the
+*The shipped agent on the MTK 8400 platform: one arm64 process owns the model, the
 memory store, the tools and the conversation history, and the app renders what
 that process emits (screenshot from the target device, 1208x2644).*
 

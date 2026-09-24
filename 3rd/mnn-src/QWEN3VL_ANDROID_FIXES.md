@@ -60,7 +60,7 @@ through complete on-device Qwen3-VL inference.
 - Generated output remained semantically coherent through decode.
 - Dynamic visual resolution and token count were not reduced.
 - App wall time was 13.90 s on the original test phone.
-- App wall time was 6.45 s on an Infinix X6877 (MT6899).
+- App wall time was 6.45 s on an MTK 8400 platform (MT6899).
 
 The verified library SHA-256 was
 `a7a0b6d7c2741b754e68bad8a143cfd97ae15d0e60ef1a1fd858577faa6a3460`.

@@ -12,7 +12,7 @@ or device packages are stored in Git.
 
 ## Result summary
 
-Device: Infinix X6877, MT6899, Android 16.
+Device: MTK 8400 platform, MT6899, Android 16.
 
 | Route | TTFT | Decode | 16-token total |
 |---|---:|---:|---:|

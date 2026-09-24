@@ -2,7 +2,7 @@
 
 **中文** | [English](README.md)
 
-`gemma-4-E2B-it` 在 Infinix X6877（`ro.soc.model=MT6899`，Dimensity 8400，Android 16，adb root）上的混合式端侧部署：
+`gemma-4-E2B-it` 在 MTK 8400 平台上（`ro.soc.model=MT6899`，Dimensity 8400，Android 16，adb root）的混合式端侧部署：
 
 | 阶段 | 位置 | 方案 |
 |---|---|---|
@@ -14,9 +14,9 @@
 | Agent：推理、记忆、规划、工具、历史 | CPU，与 runner 同进程 | `runtime/agent/` |
 | UI | Android 应用 | `Gemma 4 D8400` |
 
-<img src="helpers/docs/images/mobile-phone-agent.jpg" alt="在目标机型上运行中的端侧 agent（Infinix X6877）" width="330">
+<img src="helpers/docs/images/mobile-phone-agent.jpg" alt="在目标机型上运行中的端侧 agent（MTK 8400 平台）" width="330">
 
-*出货版 agent 跑在 Infinix X6877 上：模型、记忆库、工具和会话历史都在同一个 arm64 进程里，App 只渲染这个进程吐出的事件（目标机截图，1208x2644）。*
+*出货版 agent 跑在 MTK 8400 平台上：模型、记忆库、工具和会话历史都在同一个 arm64 进程里，App 只渲染这个进程吐出的事件（目标机截图，1208x2644）。*
 
 真机上按出货的 480x624 画布端到端跑：视觉编码器（front DLA，patchify + 16 层，全部在 MDLA 上）耗时 **0.51–0.61 s**，CPU 3x3 池化与 tail DLA merger 再花约 5 ms，prefill 为 1.4–2.1 s，因此首个请求 TTFT 为 2.0–2.7 s（后续请求多一次 1.9 s 的 MNN 重建，见 trap T15），decode 17.7–18.9 token/s，图像描述正确（对 HuggingFace 的余弦相似度 0.994–0.999）。测量数据与影响设计的发现见 [helpers/STATUS.md](helpers/STATUS.md)。
 
