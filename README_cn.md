@@ -18,7 +18,7 @@
 
 *目标机截图（1208x2644）。模型、记忆库、工具和会话历史都在同一个 arm64 进程里，App 只渲染这个进程吐出的事件。*
 
-真机上按出货的 480x624 画布端到端跑：视觉编码器（front DLA，patchify + 16 层，全部在 MDLA 上）耗时 0.51–0.61 s，CPU 3x3 池化与 tail DLA merger 再花约 5 ms，prefill 为 1.4–2.1 s，因此首个请求 TTFT 为 2.0–2.7 s。后续请求多一次 1.9 s 的 MNN 重建（见 trap T15）。decode 17.7–18.9 token/s，图像描述正确（对 HuggingFace 的余弦相似度 0.994–0.999）。
+真机上按 480x624 画布端到端跑：视觉编码器（front DLA，patchify + 16 层，全部在 MDLA 上）耗时 0.51–0.61 s，CPU 3x3 池化与 tail DLA merger 再花约 5 ms，prefill 为 1.4–2.1 s，因此首个请求 TTFT 为 2.0–2.7 s。后续请求多一次 1.9 s 的 MNN 重建（见 trap T15）。decode 17.7–18.9 token/s，图像描述正确（对 HuggingFace 的余弦相似度 0.994–0.999）。
 
 完整的复现手册（环境、架构决策、流水线、陷阱目录、验证数据、代码摘录）是 `helpers/docs/Gemma4-E2B-D8400-Hybrid-Deployment.docx`，由 `helpers/tools/make_reproduction_doc.py` 生成，任何一次重跑之后都可以重新出文档。
 
@@ -51,7 +51,7 @@ app  <--tail---  agent/events.jsonl   (steps, tool calls, memory writes, metrics
 
 ### 模型用它自己原生的语法调用工具
 
-`gemma-4-E2B-it` 的后训练就是围绕它 chat template 定义的函数调用语法，而出货的 Q4 导出会自发地产生这套语法：
+`gemma-4-E2B-it` 的后训练就是围绕它 chat template 定义的函数调用语法，而 Q4 导出会自发地产生这套语法：
 
 ```text
 declaration  <|tool>declaration:calculator{description:<|"|>...<|"|>,parameters:{...}}<tool|>
@@ -73,7 +73,7 @@ tool answer  <|tool_response>response:calculator{ok:true,result:<|"|>17*23 = 391
 
 文本轮次走 prompt-cache 增量路径，每轮预填充约 20–160 token，而不是约 900。任何改变会话的动作（新建会话、一次压缩、一个图像轮次）都会先重建 MNN 引擎，因为 `Llm::reset()` 无法完全清空 Gemma 4 的混合滑窗 KV cache（trap T15）。
 
-### 出货版 Q4 导出的真实边界
+### Q4 导出的真实边界
 
 * 工具调用和多轮循环是通的，但模型无法可靠地复述 token 序列：让它重复 `5927452215`，它答 `51937423`；`ZQ7-4412` 会变成 `ZQ3-4412`，而且这些都没走工具。因此工具应当返回模型能简单复述的值，同时 App 把每个观测结果单独渲染成卡片，让用户看到确切结果。
 * 工具名字会漂移（`get_time`、`current_time`、`calc`、单字母笔误）。注册表在报错之前会先解析别名和单字符偏差。
@@ -96,7 +96,7 @@ tool answer  <|tool_response>response:calculator{ok:true,result:<|"|>17*23 = 391
 
 ### 意图路由
 
-每个轮次先做分类，用 `runtime/agent/agent_intent.cpp` 里的原生模式匹配，不调用模型。得到的策略决定后续一切：是否查询长期记忆、是否预期工具调用、答案是否必须保持纯文本。问候语不触碰记忆库；算术或时钟问题由路由直接给出确切的调用；记忆类问题直接由存储回答、不调工具；图像描述禁止工具（`image_info{data:...}` 那类尝试正是这样被拦下的）。判定结果以 `intent` 事件发出，并在聊天里显示成一张卡片。对图像描述，如果答案拒绝作答、把问题反弹回来或过短，会回退到出货的单轮 prompt（"Describe this image."）。
+每个轮次先做分类，用 `runtime/agent/agent_intent.cpp` 里的原生模式匹配，不调用模型。得到的策略决定后续一切：是否查询长期记忆、是否预期工具调用、答案是否必须保持纯文本。问候语不触碰记忆库；算术或时钟问题由路由直接给出确切的调用；记忆类问题直接由存储回答、不调工具；图像描述禁止工具（`image_info{data:...}` 那类尝试正是这样被拦下的）。判定结果以 `intent` 事件发出，并在聊天里显示成一张卡片。对图像描述，如果答案拒绝作答、把问题反弹回来或过短，会回退到单轮 prompt（"Describe this image."）。
 
 ### 附件是一次性的
 
@@ -142,7 +142,7 @@ helpers/tools/run_agent_live_probe.sh       # real Q4 weights on x86: protocol, 
 | `created_ms`、`updated_ms`、`last_access_ms`、`access_count` | 时间与频次信号 |
 | `session`、`turn`、`tags` | 溯源信息，能把一条记录追到写入它的那个轮次 |
 
-写入。`AgentRuntime::write_memories()` 在每一轮之后运行。规则抽取器（`agent_prompt.cpp` 里的 `extract_memories()`）把显式的 "记住…" / "remember …" 变成 `fact`（importance 0.9），把身份陈述（"我叫…"、"我住在…"、"call me …"）变成 `fact`（0.8），把偏好（"我喜欢…"、"i prefer …"）变成 `preference`（0.7）。祈使前缀会被剥掉，所以库里存的是 "我叫杨雷" 而不是 "记住: 我叫杨雷"。修正标记（"改成"、"改为"、"instead"）会把文本裁到修正后的部分并给记录打标，于是它替换掉旧值而不是再加一条。其余内容记为 `episode`（"Q: … -> A: …"，importance 0.3），除非打开 `store_episodes`，否则会被丢弃：轮次 episode 属于会话记录，通过 `search_history` 找。每次写入都发出 `memory_write`，带 id、kind，以及这条记录是 `new`、`merged` 还是 `updated`。`GEMMA4_AGENT_MODEL_MEMORY=1` 会加一次小模型调用、可以取代规则输出；默认关闭，因为出货的 Q4 导出是在规则输出上验证的。
+写入。`AgentRuntime::write_memories()` 在每一轮之后运行。规则抽取器（`agent_prompt.cpp` 里的 `extract_memories()`）把显式的 "记住…" / "remember …" 变成 `fact`（importance 0.9），把身份陈述（"我叫…"、"我住在…"、"call me …"）变成 `fact`（0.8），把偏好（"我喜欢…"、"i prefer …"）变成 `preference`（0.7）。祈使前缀会被剥掉，所以库里存的是 "我叫杨雷" 而不是 "记住: 我叫杨雷"。修正标记（"改成"、"改为"、"instead"）会把文本裁到修正后的部分并给记录打标，于是它替换掉旧值而不是再加一条。其余内容记为 `episode`（"Q: … -> A: …"，importance 0.3），除非打开 `store_episodes`，否则会被丢弃：轮次 episode 属于会话记录，通过 `search_history` 找。每次写入都发出 `memory_write`，带 id、kind，以及这条记录是 `new`、`merged` 还是 `updated`。`GEMMA4_AGENT_MODEL_MEMORY=1` 会加一次小模型调用、可以取代规则输出；默认关闭，因为 Q4 导出是在规则输出上验证的。
 
 去重。`MemoryStore::add()` 按顺序试三条规则，命中第一条就停：
 
@@ -187,7 +187,7 @@ helpers/tools/run_agent_live_probe.sh       # real Q4 weights on x86: protocol, 
 
 会话与控制。`create()` / `open()` / `rename()` / `remove()` 都通过 `index.json` 工作；当它丢失时会扫描会话目录重建，因此索引损坏不会让历史消失。新会话的标题取第一条用户文本（上限 `session_title_chars`），最多保留 `max_sessions`（40）个会话，最旧的连同目录一起删除。App 通过 `request.json` 驱动这一切（`new_session`、`open_session`、`delete_session`、`rename_session`、`list_sessions`、`history`、`compact`、`reset`），并镜像事件流（`turn_start`、`context`、`context_compacted`、`session_notes`、`answer`、`turn_end`）。会话页的"删除全部会话"只需一次点击加一次确认。
 
-这套形态来自 Mobile-Agent 系列的两级窗口，但出货运行时用"一张图只活在它自己的轮次"加压缩来实现它。`image_window_turns`、`tool_detail_window_turns`、`recent_turns_max` 和 `max_context_turns` 仍会被解析并由 `capabilities` 上报，但真正驱动策略的只有 `recent_turns_min`、`compaction_min_turns` 以及笔记的几条上限。
+这套形态来自 Mobile-Agent 系列的两级窗口，但运行时用"一张图只活在它自己的轮次"加压缩来实现它。`image_window_turns`、`tool_detail_window_turns`、`recent_turns_max` 和 `max_context_turns` 仍会被解析并由 `capabilities` 上报，但真正驱动策略的只有 `recent_turns_min`、`compaction_min_turns` 以及笔记的几条上限。
 
 ## 视觉图
 
@@ -223,7 +223,7 @@ ONNX  vs torch       : cosine 0.9999999
 | profile | patch 网格 | 画布 | 最大软 token | front DLA |
 |---|---|---|---:|---:|
 | 默认 | 54x45 | 864x720 | 270 | ~2.2 s |
-| 出货 | 30x39 | 480x624 | 130 | 0.57 s |
+| 实机 | 30x39 | 480x624 | 130 | 0.57 s |
 | 备选 | 36x36 | 576x576 | 144 | 0.51 s |
 
 ```bash
@@ -247,7 +247,7 @@ ONNX  vs torch       : cosine 0.9999999
 ./helpers/scripts/12_reproduce_all.sh --check-only  # preflight only: model, SDK, python, device
 ```
 
-`12_reproduce_all.sh` 默认走出货的 30x39 profile（`out-30x39/`），先检查全部前置条件，再跑步骤 1–12（主机 agent 测试套件、arm64 runner、APK、x86 live agent probe）以及手工重生成，最后做一致性检查（DLA/TFLite/MNN/APK 齐全、组装权重与导出逐字节一致，trap T16）。`--grid 54 45` 用最初的 profile，`--from N` 续跑，`--no-device` 停在 APK，`--force` 忽略已有产物。如果 `$OUT` 里已经有另一个画布的图，它会拒绝启动，因为步骤 01 会静默复用它。全部输出 tee 到 `logs/reproduce-<timestamp>.log`。
+`12_reproduce_all.sh` 默认走 30x39 profile（`out-30x39/`），先检查全部前置条件，再跑步骤 1–12（主机 agent 测试套件、arm64 runner、APK、x86 live agent probe）以及手工重生成，最后做一致性检查（DLA/TFLite/MNN/APK 齐全、组装权重与导出逐字节一致，trap T16）。`--grid 54 45` 用最初的 profile，`--from N` 续跑，`--no-device` 停在 APK，`--force` 忽略已有产物。如果 `$OUT` 里已经有另一个画布的图，它会拒绝启动，因为步骤 01 会静默复用它。全部输出 tee 到 `logs/reproduce-<timestamp>.log`。
 
 重新构建的 APK 可能在 `:app:packageDebug` 撞上 AGP 的 `integer overflow`：增量打包器按 32 位算大小，而 APK 有 2.9 GB。步骤 8 会识别这条消息并在 `:app:clean`（非增量打包）之后重试，所以重跑不需要手工清理。
 

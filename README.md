@@ -21,7 +21,7 @@ Hybrid on-device deployment of `gemma-4-E2B-it` on the MTK 8400 platform
 the memory store, the tools and the conversation history; the app renders what
 that process emits.*
 
-End to end on the phone at the shipped 480x624 canvas: the vision encoder (front
+End to end on the phone at the 480x624 canvas: the vision encoder (front
 DLA, patchify + 16 layers, entirely on MDLA) takes 0.51-0.61 s, the CPU 3x3
 pooling and the tail DLA merger add about 5 ms, and prefill is 1.4-2.1 s, so the
 first request has a TTFT of 2.0-2.7 s. Later requests pay a 1.9 s MNN rebuild
@@ -103,7 +103,7 @@ session, a compaction, an image turn - recreates the MNN engine first, because
 `Llm::reset()` does not fully clear Gemma 4's mixed sliding-window KV cache
 (trap T15).
 
-### Limits of the shipped Q4 export
+### Limits of the Q4 export
 
 - Tool calling and the multi-turn loop work, but the model cannot copy a token
   sequence reliably. Asked to repeat `5927452215` it answers `51937423`, and
@@ -153,7 +153,7 @@ the router, a memory question is answered from the store without tools, and an
 image description forbids tools (which is what stopped the `image_info{data:...}`
 attempts). The decision is emitted as an `intent` event and shown as a card in
 the chat. For image descriptions, an answer that refuses, bounces the question
-back or is too short is replaced by the shipped single-shot prompt ("Describe
+back or is too short is replaced by the single-shot prompt ("Describe
 this image.").
 
 ### Attachments are one-shot
@@ -193,7 +193,7 @@ export otherwise tries to hand the image bytes to that tool. An unparseable
 tool-shaped answer triggers one plain-text retry.
 
 Open-ended advice about an image ("how to make this image better") is still
-beyond this export, so the UI ships a 描述图片 quick action for the path the
+beyond this export, so the UI offers a 描述图片 quick action for the path the
 deployment actually validates.
 
 ### Verification
@@ -249,7 +249,7 @@ transcript and are found through `search_history`. Each write emits
 `memory_write` with the id, the kind and whether the record was `new`, `merged`
 or `updated`. `GEMMA4_AGENT_MODEL_MEMORY=1` adds a small extra model pass that
 can replace the rule output. It is off by default, because the rules are what the
-shipped Q4 export was validated with.
+Q4 export was validated with.
 
 De-duplication. `MemoryStore::add()` tries three rules in order and stops at the
 first match:
@@ -371,7 +371,7 @@ directory. The app drives it all through `request.json` (`new_session`,
 session tab is one tap and one confirmation.
 
 The two-tier windows borrowed from the Mobile-Agent family are the reason for
-this shape, but the shipped runtime implements them as "an image lives in its own
+this shape, but the runtime implements them as "an image lives in its own
 turn" plus compaction. `image_window_turns`, `tool_detail_window_turns`,
 `recent_turns_max` and `max_context_turns` are still parsed and reported by
 `capabilities`, but only `recent_turns_min`, `compaction_min_turns` and the notes
@@ -430,7 +430,7 @@ different DLA pair, runner and APK:
 | profile | patch grid | canvas | max soft tokens | front DLA |
 |---|---|---|---:|---:|
 | default | 54x45 | 864x720 | 270 | ~2.2 s |
-| shipped | 30x39 | 480x624 | 130 | 0.57 s |
+| device | 30x39 | 480x624 | 130 | 0.57 s |
 | alternative | 36x36 | 576x576 | 144 | 0.51 s |
 
 ```bash
@@ -462,7 +462,7 @@ Two wrapper scripts drive the steps end to end:
 ./helpers/scripts/12_reproduce_all.sh --check-only  # preflight only: model, SDK, python, device
 ```
 
-`12_reproduce_all.sh` defaults to the shipped 30x39 profile (`out-30x39/`), checks
+`12_reproduce_all.sh` defaults to the 30x39 profile (`out-30x39/`), checks
 every prerequisite before it starts, runs steps 1-12 (the host agent test suite,
 the arm64 runner, the APK and the x86 live agent probe) plus the manual
 regeneration, and finishes with consistency checks (DLA/TFLite/MNN/APK present,
