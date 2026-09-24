@@ -1,0 +1,95 @@
+plugins {
+    id "com.android.application"
+}
+
+def fixedPrompt = "Please describe this image."
+def dynamicRuntimeAssetsDir = providers.gradleProperty("dynamicRuntimeAssetsDir")
+        .getOrElse("$rootDir/package-assets")
+def letterboxRuntimeAssetsDir = providers.gradleProperty("letterboxRuntimeAssetsDir")
+        .getOrElse("$rootDir/package-assets-letterbox")
+
+android {
+    namespace "com.example.minicpmv46.neuropilot"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.example.minicpmv46.neuropilot"
+        minSdk 29
+        targetSdk 34
+        buildConfigField "String", "FIXED_PROMPT", groovy.json.JsonOutput.toJson(fixedPrompt)
+    }
+
+    flavorDimensions += "imagePreprocessor"
+    productFlavors {
+        dynamic {
+            dimension "imagePreprocessor"
+            versionCode 7
+            versionName "1.3.1"
+            manifestPlaceholders = [appLabel: "PhoneVLM Adaptive"]
+            buildConfigField "String", "APP_TITLE",
+                    groovy.json.JsonOutput.toJson("Model: PhoneVLM Adaptive")
+            buildConfigField "String", "IMAGE_PREPROCESSOR",
+                    groovy.json.JsonOutput.toJson("adaptive")
+            buildConfigField "String", "IMAGE_MODE_LABEL",
+                    groovy.json.JsonOutput.toJson(
+                            "Dynamic multi-tile + automatic letterbox fallback")
+            buildConfigField "String", "RUNTIME_ROOT",
+                    groovy.json.JsonOutput.toJson("/data/local/tmp/minicpmv46-neuropilot")
+            buildConfigField "String", "RUNTIME_ASSET_VERSION",
+                    groovy.json.JsonOutput.toJson("20260807-adaptive-1")
+            buildConfigField "String", "RUNNER_NAME",
+                    groovy.json.JsonOutput.toJson("minicpmv46-hybrid-runner")
+            buildConfigField "String", "BRIDGE_NAME",
+                    groovy.json.JsonOutput.toJson("minicpmv46-neuropilot-bridge.sh")
+            buildConfigField "String", "VISION_MODEL_FILES",
+                    groovy.json.JsonOutput.toJson(
+                            "models/visual_560x392_fp16_mt6899.dla;" +
+                            "models/visual_392x504_fp16_mt6899.dla;" +
+                            "models/visual_504x392_fp16_mt6899.dla")
+        }
+        letterbox {
+            dimension "imagePreprocessor"
+            applicationIdSuffix ".letterbox"
+            versionCode 7
+            versionName "1.2.1-letterbox"
+            manifestPlaceholders = [appLabel: "PhoneVLM Letterbox"]
+            buildConfigField "String", "APP_TITLE",
+                    groovy.json.JsonOutput.toJson("Model: PhoneVLM Letterbox")
+            buildConfigField "String", "IMAGE_PREPROCESSOR",
+                    groovy.json.JsonOutput.toJson("letterbox")
+            buildConfigField "String", "IMAGE_MODE_LABEL",
+                    groovy.json.JsonOutput.toJson("392x504 fit + padding, single tile")
+            buildConfigField "String", "RUNTIME_ROOT",
+                    groovy.json.JsonOutput.toJson(
+                            "/data/local/tmp/minicpmv46-neuropilot-letterbox")
+            buildConfigField "String", "RUNTIME_ASSET_VERSION",
+                    groovy.json.JsonOutput.toJson("20260807-letterbox-2")
+            buildConfigField "String", "RUNNER_NAME",
+                    groovy.json.JsonOutput.toJson("minicpmv46-letterbox-runner")
+            buildConfigField "String", "BRIDGE_NAME",
+                    groovy.json.JsonOutput.toJson("minicpmv46-letterbox-bridge.sh")
+            buildConfigField "String", "VISION_MODEL_FILES",
+                    groovy.json.JsonOutput.toJson(
+                            "models/visual_504x392_fp16_mt6899.dla")
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    sourceSets {
+        dynamic.assets.srcDir file(dynamicRuntimeAssetsDir)
+        letterbox.assets.srcDir file(letterboxRuntimeAssetsDir)
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    androidResources {
+        noCompress += ["dla", "mnn", "weight", "mtok", "so", "sh", "json"]
+    }
+}

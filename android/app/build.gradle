@@ -1,0 +1,117 @@
+plugins {
+    id "com.android.application"
+}
+
+def fixedPrompt = "Describe this image."
+def visionPlatform = providers.gradleProperty("visionPlatform")
+        .getOrElse("mt6899")
+// Vision canvas geometry. The DLA is compiled for a fixed patch grid, so the
+// app must letterbox into exactly the same canvas; both come from the same
+// GEMMA4_GRID_W/GEMMA4_GRID_H that built the DLAs (see ../env.sh).
+def gridColumns = providers.gradleProperty("gridColumns").getOrElse("54")
+def gridRows = providers.gradleProperty("gridRows").getOrElse("45")
+def canvasWidth = (gridColumns as int) * 16
+def canvasHeight = (gridRows as int) * 16
+def runtimeAssetsDir = providers.gradleProperty("runtimeAssetsDir")
+        .getOrElse("$rootDir/package-assets")
+def resolveRuntimeAssets = { value ->
+    def path = new File(value.toString())
+    path.isAbsolute() ? path : new File(project.rootDir, value.toString())
+}
+
+def runtimeFilesFor = { platform ->
+    [
+            "runtime/config.json",
+            "runtime/libMNN.so",
+            "runtime/libneuron_adapter.so.9.3.1",
+            "runtime/libneuron_runtime.so.9.3.1",
+            "runtime/llm.mnn",
+            "runtime/llm.mnn.weight",
+            "runtime/llm_config.json",
+            "runtime/ple_embeddings_int4.bin",
+            "runtime/tokenizer.mtok",
+            "runtime/gemma4-d8400-runner",
+            "runtime/gemma4-d8400-bridge.sh",
+            "runtime/agent-config.json",
+            "runtime/models/visual_front_w8a16_${platform}.dla",
+            "runtime/models/visual_tail_w8a16_${platform}.dla"
+    ]
+}
+
+android {
+    namespace "com.example.gemma4d8400.neuropilot"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.example.gemma4d8400.neuropilot"
+        minSdk 29
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+        manifestPlaceholders = [appLabel: "Gemma 4 D8400"]
+        buildConfigField "String", "FIXED_PROMPT", groovy.json.JsonOutput.toJson(fixedPrompt)
+        buildConfigField "String", "VISION_PLATFORM",
+                groovy.json.JsonOutput.toJson(visionPlatform)
+        buildConfigField "String", "APP_TITLE",
+                groovy.json.JsonOutput.toJson("Model: Gemma 4 E2B W8A16 + MNN Q4")
+        buildConfigField "String", "VISION_PRECISION",
+                groovy.json.JsonOutput.toJson("W8A16")
+        buildConfigField "String", "IMAGE_MODE_LABEL",
+                groovy.json.JsonOutput.toJson(
+                        "${canvasWidth}x${canvasHeight} fit + padding, " +
+                                "W8A16 vision")
+        buildConfigField "int", "GRID_COLUMNS", "${gridColumns}"
+        buildConfigField "int", "GRID_ROWS", "${gridRows}"
+        buildConfigField "String", "RUNTIME_ROOT",
+                groovy.json.JsonOutput.toJson("/data/local/tmp/gemma4-d8400")
+        buildConfigField "String", "RUNTIME_ASSET_VERSION",
+                groovy.json.JsonOutput.toJson(
+                        "20260920-gemma4-agent-${gridColumns}x${gridRows}-1")
+        buildConfigField "String", "RUNNER_NAME",
+                groovy.json.JsonOutput.toJson("gemma4-d8400-runner")
+        buildConfigField "String", "BRIDGE_NAME",
+                groovy.json.JsonOutput.toJson("gemma4-d8400-bridge.sh")
+        buildConfigField "String", "VISION_MODEL_FILES",
+                groovy.json.JsonOutput.toJson(
+                        "models/visual_front_w8a16_${visionPlatform}.dla;" +
+                                "models/visual_tail_w8a16_${visionPlatform}.dla")
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    sourceSets {
+        main.assets.srcDir resolveRuntimeAssets(runtimeAssetsDir)
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    androidResources {
+        noCompress += ["dla", "mnn", "weight", "mtok", "so", "sh", "json", "bin"]
+    }
+}
+
+tasks.register("validateRuntimeAssets") {
+    doLast {
+        def root = resolveRuntimeAssets(runtimeAssetsDir)
+        def missing = runtimeFilesFor(visionPlatform).findAll { relative ->
+            !new File(root, relative).isFile()
+        }
+        if (!missing.isEmpty()) {
+            throw new GradleException(
+                    "Missing runtime assets under ${root} for platform ${visionPlatform}: " +
+                            missing.join(", "))
+        }
+    }
+}
+
+tasks.configureEach { task ->
+    if (task.name.startsWith("preBuild")) {
+        task.dependsOn("validateRuntimeAssets")
+    }
+}

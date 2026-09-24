@@ -1,0 +1,94 @@
+CPU Group: [ 0  1  2  3 ], 300000 - 2100000
+CPU Group: [ 4  5  6 ], 400000 - 3000000
+CPU Group: [ 7 ], 1000000 - 3250000
+(last_midr & (CPUINFO_ARM_MIDR_IMPLEMENTER_MASK | CPUINFO_ARM_MIDR_PART_MASK))=0x 4100d870 in _getInfoArm, 1244
+The device supports: i8sdot:1, fp16:1, i8mm: 1, sve2: 1, sme2: 0
+TOKEN index=1 id=760
+TOKEN index=2 id=2099
+TOKEN index=3 id=4774
+TOKEN index=4 id=264
+TOKEN index=5 id=1637
+TOKEN index=6 id=440
+TOKEN index=7 id=264
+TOKEN index=8 id=20002
+TOKEN index=9 id=11
+TOKEN index=10 id=20002
+TOKEN index=11 id=12
+TOKEN index=12 id=32323
+TOKEN index=13 id=3144
+TOKEN index=14 id=7258
+TOKEN index=15 id=13
+TOKEN index=16 id=561
+TOKEN index=17 id=3714
+TOKEN index=18 id=369
+TOKEN index=19 id=11884
+TOKEN index=20 id=264
+TOKEN index=21 id=4145
+TOKEN index=22 id=11
+TOKEN index=23 id=15855
+TOKEN index=24 id=26421
+TOKEN index=25 id=11
+TOKEN index=26 id=440
+TOKEN index=27 id=874
+TOKEN index=28 id=9155
+TOKEN index=29 id=16922
+TOKEN index=30 id=21602
+TOKEN index=31 id=466
+TOKEN index=32 id=4945
+TOKEN index=33 id=21602
+TOKEN index=34 id=13
+TOKEN index=35 id=561
+TOKEN index=36 id=3870
+TOKEN index=37 id=369
+TOKEN index=38 id=13983
+TOKEN index=39 id=321
+TOKEN index=40 id=632
+TOKEN index=41 id=656
+TOKEN index=42 id=371
+TOKEN index=43 id=21332
+TOKEN index=44 id=11
+TOKEN index=45 id=21873
+TOKEN index=46 id=421
+TOKEN index=47 id=279
+TOKEN index=48 id=5077
+TOKEN index=49 id=8198
+TOKEN index=50 id=383
+TOKEN index=51 id=279
+TOKEN index=52 id=3714
+TOKEN index=53 id=13
+TOKEN index=54 id=561
+TOKEN index=55 id=7830
+TOKEN index=56 id=20158
+TOKEN index=57 id=369
+TOKEN index=58 id=799
+TOKEN index=59 id=314
+TOKEN index=60 id=37685
+TOKEN index=61 id=321
+TOKEN index=62 id=50020
+TOKEN index=63 id=13
+TOKEN index=64 id=248046
+RESULT backend=npu
+RESULT vision_load_ms=251.130077
+RESULT llm_load_ms=963.152616
+RESULT prompt_tokens=86
+RESULT image_tokens=63
+RESULT visual_cosine=0.999973
+RESULT visual_mae=0.000822
+RESULT visual_max_error=0.025592
+RESULT visual_all_finite=1
+RESULT vision_ms=380.364693
+RESULT embedding_inject_ms=0.546693
+RESULT llm_prefill_ms=447.900000
+RESULT sample_ms=29.325000
+RESULT ttft_ms=835.182154
+RESULT generated_tokens=64
+RESULT llm_decode_ms=1022.338000
+RESULT decode_ms_per_token=16.227587
+RESULT decode_tokens_per_second=61.623455
+RESULT inference_wall_ms=1891.899307
+RESULT process_wall_ms=3261.960538
+RESULT token_ids=760,2099,4774,264,1637,440,264,20002,11,20002,12,32323,3144,7258,13,561,3714,369,11884,264,4145,11,15855,26421,11,440,874,9155,16922,21602,466,4945,21602,13,561,3870,369,13983,321,632,656,371,21332,11,21873,421,279,5077,8198,383,279,3714,13,561,7830,20158,369,799,314,37685,321,50020,13,248046
+RESULT text_begin
+The image shows a person with a neutral, neutral-appearing expression. The individual is wearing a simple, casual outfit, with no visible clothing accessories or additional accessories. The background is plain and unobtrusive, ensuring that the focus remains on the individual. The overall impression is one of simplicity and neutrality.
+
+RESULT text_end

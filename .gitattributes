@@ -1,0 +1,21 @@
+# This package is built and run on Linux (WSL).  Force LF in the repository and
+# in every checkout so a Windows clone with core.autocrlf=true cannot rewrite
+# the shell scripts, the python tools or the MNN sources.
+* text=auto eol=lf
+
+# Windows helpers stay CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Artefacts that must never be line-ending converted.
+*.so binary
+*.apk binary
+*.aab binary
+*.bin binary
+*.onnx binary
+*.tflite binary
+*.dla binary
+*.mtok binary
+*.docx binary
+*.jpg binary
+*.png binary

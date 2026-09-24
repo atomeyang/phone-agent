@@ -1,0 +1,93 @@
+CPU Group: [ 0  1  2  3 ], 300000 - 2100000
+CPU Group: [ 4  5  6 ], 400000 - 3000000
+CPU Group: [ 7 ], 1000000 - 3250000
+(last_midr & (CPUINFO_ARM_MIDR_IMPLEMENTER_MASK | CPUINFO_ARM_MIDR_PART_MASK))=0x 4100d870 in _getInfoArm, 1244
+The device supports: i8sdot:1, fp16:1, i8mm: 1, sve2: 1, sme2: 0
+TOKEN index=1 id=760
+TOKEN index=2 id=2099
+TOKEN index=3 id=4774
+TOKEN index=4 id=264
+TOKEN index=5 id=1637
+TOKEN index=6 id=440
+TOKEN index=7 id=264
+TOKEN index=8 id=20002
+TOKEN index=9 id=11
+TOKEN index=10 id=20002
+TOKEN index=11 id=12
+TOKEN index=12 id=32323
+TOKEN index=13 id=3144
+TOKEN index=14 id=7258
+TOKEN index=15 id=11
+TOKEN index=16 id=4222
+TOKEN index=17 id=264
+TOKEN index=18 id=6376
+TOKEN index=19 id=466
+TOKEN index=20 id=6376
+TOKEN index=21 id=31938
+TOKEN index=22 id=13
+TOKEN index=23 id=561
+TOKEN index=24 id=3714
+TOKEN index=25 id=369
+TOKEN index=26 id=11884
+TOKEN index=27 id=264
+TOKEN index=28 id=4145
+TOKEN index=29 id=11
+TOKEN index=30 id=13983
+TOKEN index=31 id=55787
+TOKEN index=32 id=26421
+TOKEN index=33 id=11
+TOKEN index=34 id=864
+TOKEN index=35 id=12846
+TOKEN index=36 id=264
+TOKEN index=37 id=15440
+TOKEN index=38 id=466
+TOKEN index=39 id=6376
+TOKEN index=40 id=2193
+TOKEN index=41 id=13
+TOKEN index=42 id=561
+TOKEN index=43 id=3870
+TOKEN index=44 id=369
+TOKEN index=45 id=13983
+TOKEN index=46 id=321
+TOKEN index=47 id=632
+TOKEN index=48 id=549
+TOKEN index=49 id=6013
+TOKEN index=50 id=290
+TOKEN index=51 id=11
+TOKEN index=52 id=21873
+TOKEN index=53 id=279
+TOKEN index=54 id=5077
+TOKEN index=55 id=8198
+TOKEN index=56 id=383
+TOKEN index=57 id=279
+TOKEN index=58 id=3714
+TOKEN index=59 id=13
+TOKEN index=60 id=561
+TOKEN index=61 id=7830
+TOKEN index=62 id=20158
+TOKEN index=63 id=369
+TOKEN index=64 id=799
+RESULT backend=mnn
+RESULT vision_load_ms=552.502769
+RESULT llm_load_ms=726.145538
+RESULT prompt_tokens=86
+RESULT image_tokens=63
+RESULT visual_cosine=0.982223
+RESULT visual_mae=0.023599
+RESULT visual_max_error=1.039744
+RESULT visual_all_finite=1
+RESULT vision_ms=1384.914539
+RESULT embedding_inject_ms=0.136000
+RESULT llm_prefill_ms=437.826000
+RESULT sample_ms=28.907000
+RESULT ttft_ms=1825.295769
+RESULT generated_tokens=64
+RESULT llm_decode_ms=967.599000
+RESULT decode_ms_per_token=15.358714
+RESULT decode_tokens_per_second=65.109617
+RESULT inference_wall_ms=2826.814462
+RESULT process_wall_ms=4237.915693
+RESULT token_ids=760,2099,4774,264,1637,440,264,20002,11,20002,12,32323,3144,7258,11,4222,264,6376,466,6376,31938,13,561,3714,369,11884,264,4145,11,13983,55787,26421,11,864,12846,264,15440,466,6376,2193,13,561,3870,369,13983,321,632,549,6013,290,11,21873,279,5077,8198,383,279,3714,13,561,7830,20158,369,799
+RESULT text_begin
+The image shows a person with a neutral, neutral-appearing expression, likely a professional or professional portrait. The individual is wearing a simple, plain-colored outfit, which suggests a formal or professional context. The background is plain and uncluttered, ensuring the focus remains on the individual. The overall impression is one
+RESULT text_end

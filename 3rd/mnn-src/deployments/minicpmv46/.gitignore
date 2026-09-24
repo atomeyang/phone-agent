@@ -1,0 +1,17 @@
+build/
+__pycache__/
+*.bin
+*.dla
+*.mnn
+*.mnn.weight
+*.npz
+*.onnx
+*.so
+*.so.*
+*.tflite
+android/.gradle/
+android/local.properties
+android/*.apk
+android/package-assets/
+android/package-assets-letterbox/
+!results/raw/*.log

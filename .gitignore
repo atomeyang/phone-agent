@@ -1,0 +1,46 @@
+# ---------------------------------------------------------------------------
+# Generated artefacts: everything listed here is rebuilt by 12_reproduce_all.sh
+# and deleted by 00_clean_generated.sh.  None of it is an input.
+# ---------------------------------------------------------------------------
+
+# conversion / build results (ONNX, TFLite, DLA, MNN Q4, APK, runner, assets)
+out/
+out-*/
+logs/
+work/
+.export.log
+
+# android / gradle
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# python
+__pycache__/
+*.py[cod]
+
+# third-party build trees: rebuilt with 3rd/mnn-src/build_lib.sh
+# (the host converter used by 05_export_mnn.sh lives in 3rd/mnn-host/)
+3rd/mnn-src/build/
+3rd/mnn-src/build-*/
+3rd/mnn-src/build32/
+3rd/mnn-src/build64/
+3rd/mnn-src/pymnn_build/
+
+# editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+ehthumbs.db
+*~
+*.swp
+*.orig
+*.rej
+*.bak
+*.bak-*

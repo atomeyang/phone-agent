@@ -1,0 +1,57 @@
+LOAD summed_runtime_ms=3344.761998 wall_ms=3398.457770
+PREFILL layer=0 ms=41.491077
+PREFILL layer=1 ms=41.031077
+PREFILL layer=2 ms=42.242769
+PREFILL layer=3 ms=16.052000
+PREFILL layer=4 ms=44.144923
+PREFILL layer=5 ms=40.642462
+PREFILL layer=6 ms=35.864307
+PREFILL layer=7 ms=16.059077
+PREFILL layer=8 ms=36.873538
+PREFILL layer=9 ms=34.999923
+PREFILL layer=10 ms=39.381154
+PREFILL layer=11 ms=12.338385
+PREFILL layer=12 ms=36.873230
+PREFILL layer=13 ms=37.600615
+PREFILL layer=14 ms=36.547923
+PREFILL layer=15 ms=16.439077
+PREFILL layer=16 ms=37.996923
+PREFILL layer=17 ms=37.348923
+PREFILL layer=18 ms=30.482462
+PREFILL layer=19 ms=10.082693
+PREFILL layer=20 ms=32.288615
+PREFILL layer=21 ms=37.379077
+PREFILL layer=22 ms=37.382846
+PREFILL layer=23 ms=13.993846
+TOKEN index=1 id=760
+FIRST_TOKEN vision_ms=383.618769 prefill_layers_ms=765.536922 head_ms=21.734769 npu_ms=1170.890460 wall_ms=1199.670770
+TOKEN index=2 id=2099 npu_ms=322.637693 wall_ms=352.765615
+TOKEN index=3 id=4774 npu_ms=283.850842 wall_ms=299.983769
+TOKEN index=4 id=264 npu_ms=355.584387 wall_ms=374.859385
+TOKEN index=5 id=1637 npu_ms=383.879695 wall_ms=400.771077
+TOKEN index=6 id=11884 npu_ms=390.646156 wall_ms=404.109231
+TOKEN index=7 id=264 npu_ms=388.270538 wall_ms=403.827461
+TOKEN index=8 id=3565 npu_ms=391.560231 wall_ms=399.604231
+TOKEN index=9 id=259 npu_ms=388.530923 wall_ms=404.857231
+TOKEN index=10 id=32553 npu_ms=382.287538 wall_ms=393.824000
+TOKEN index=11 id=321 npu_ms=382.102770 wall_ms=398.121308
+TOKEN index=12 id=27233 npu_ms=387.556004 wall_ms=396.144923
+TOKEN index=13 id=13 npu_ms=390.488158 wall_ms=411.452615
+TOKEN index=14 id=561 npu_ms=389.130000 wall_ms=397.678077
+TOKEN index=15 id=3870 npu_ms=397.265925 wall_ms=403.612231
+TOKEN index=16 id=369 npu_ms=363.775304 wall_ms=378.601769
+RESULT vision_ms=383.618769
+RESULT prefill_layers_ms=765.536922
+RESULT prefill_head_ms=21.734769
+RESULT first_token_id=760
+RESULT ttft_npu_ms=1170.890460
+RESULT ttft_wall_ms=1199.670770
+RESULT decode_count=15
+RESULT decode_npu_average_ms=373.171078
+RESULT decode_wall_average_ms=388.014195
+RESULT decode_wall_p50_ms=398.121308
+RESULT decode_wall_p90_ms=404.857231
+RESULT decode_tokens_per_second=2.577225
+RESULT generated_tokens=16
+RESULT eos_reached=0
+RESULT total_wall_ms=7032.503616

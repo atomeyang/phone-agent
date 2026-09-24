@@ -1,0 +1,2 @@
+#!/bin/bash
+GRADLE_USER_HOME="${HOME}/.gradle" exec "${HOME}/.gradle/wrapper/dists/gradle-8.11.1-bin/eac4u065zwes5phgltp5f9b9e/gradle-8.11.1/bin/gradle" "$@"
