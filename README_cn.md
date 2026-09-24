@@ -22,13 +22,11 @@
 
 完整的复现手册（环境、架构决策、流水线、陷阱目录、验证数据、代码摘录）是 `helpers/docs/Gemma4-E2B-D8400-Hybrid-Deployment.docx`，由 `helpers/tools/make_reproduction_doc.py` 生成，任何一次重跑之后都可以重新出文档。
 
-部署形态的只读参考：`/mnt/d/codes/Gallery/gitlab/phonevlm/mtk` 下的 MT6899 MiniCPM-V 4.6 交付，同一代 SoC、同一个 NeuroPilot 9.0.9 SDK。
-
 ## 为什么这样切分
 
-视觉塔是固定形状、权重密集的卷积/注意力堆叠，正是 MDLA 配 int8 权重最擅长的形态，同时把约 150 M 参数的计算从 CPU 上移走。
+视觉塔是固定形状、权重密集的卷积/注意力堆叠，正是 MDLA 配 int8 权重最擅长的形态。
 
-文本主干一次只生成一个 token。每次 NPU 调用都要付一次图边界的代价，而 MiniCPM-V 在这个 SoC 上的实测显示 decode 会从约 62 token/s（MNN CPU）跌到约 2.6 token/s（逐层 NPU 图）。所以文本留在 MNN Q4 上。
+文本主干一次只生成一个 token。每次 NPU 调用都要付一次图边界的代价，而这个 SoC 上的实测显示 decode 会从约 62 token/s（MNN CPU）跌到约 2.6 token/s（逐层 NPU 图）。所以文本留在 MNN Q4 上。
 
 ## 端侧 Agent（原生实现）
 
@@ -304,7 +302,7 @@ demo 本体是 `android/` 加 `runtime/`（App 驱动的那个 arm64 进程）�
 | `3rd/` | 内置的 MNN fork、主机端 `MNNConvert`、arm64 `libMNN.so`、NeuroPilot 设备端库 |
 | `env.sh`、`agent-config.json` | 共享环境（`MTKG`、`OUT*`、`LOGS`、工具链路径）与 agent 运行配置 |
 | `helpers/scripts/` | `00_clean_generated.sh` 与 `06`–`12`：编译 runner、组装素材、打 APK、部署、运行 demo、切换画布、一键复现 |
-| `helpers/STATUS.md`、`helpers/01`–`05`、`helpers/src`、`helpers/tools`、`helpers/tests`、`helpers/inputs`、`helpers/docs`、`helpers/profiles`、`helpers/minicpmv46` | 测量与分析报告、checkpoint → DLA/MNN 转换、主机探针与评测套件、校准图像、手册，以及 MiniCPM-V 参考 demo 遗留的脚本 |
+| `helpers/STATUS.md`、`helpers/01`–`05`、`helpers/src`、`helpers/tools`、`helpers/tests`、`helpers/inputs`、`helpers/docs`、`helpers/profiles` | 测量与分析报告、checkpoint → DLA/MNN 转换、主机探针与评测套件、校准图像、手册与 profiles |
 | `docs/images/` | 本 README 引用的截图 |
 
 那半边的细节见 `helpers/README.md`。生成产物无论由哪个步骤产生，都留在根目录（`out/`、`out-<W>x<H>/`、`logs/`、`work/`）。
@@ -313,7 +311,7 @@ demo 本体是 `android/` 加 `runtime/`（App 驱动的那个 arm64 进程）�
 
 | 路径 | 来源 |
 |---|---|
-| `mnn-src/` | phonevlm 的 MNN fork（`gemma4` 导出器 + PLE 运行时），来自 MiniCPM-V 参考工程 |
+| `mnn-src/` | 内置的 MNN fork，带 `gemma4` 导出器与 PLE 运行时 |
 | `mnn-host/` | 主机端 `MNNConvert`（只被 Python 导出步骤使用） |
 | `mnn-android/libMNN.so` | 带 LLM 支持的 arm64 MNN 运行时 |
 | `neuron/runtime/` | `mt6899` 的 NeuroPilot 9.0.9 设备端库 |

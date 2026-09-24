@@ -34,20 +34,15 @@ trap catalogue, verification numbers, code excerpts - is
 `helpers/tools/make_reproduction_doc.py`, so it can be regenerated after any
 rerun.
 
-Read-only reference for the deployment shape: the MT6899 MiniCPM-V 4.6 delivery
-at `/mnt/d/codes/Gallery/gitlab/phonevlm/mtk`, same SoC family and same
-NeuroPilot 9.0.9 SDK.
-
 ## Why the split looks like this
 
 The vision tower is a fixed-shape, weight-heavy convolutional/attention stack,
-which is exactly what MDLA with int8 weights is good at, and it takes about
-150 M parameters of work off the CPU.
+which is exactly what MDLA with int8 weights is good at.
 
 The text backbone generates one token at a time. Every NPU invocation costs a
-graph boundary, and MiniCPM-V measurements on this SoC show decode collapsing
-from about 62 token/s on MNN CPU to about 2.6 token/s with per-layer NPU graphs.
-Text therefore stays on MNN Q4.
+graph boundary, and measurements on this SoC show decode collapsing from about
+62 token/s on MNN CPU to about 2.6 token/s with per-layer NPU graphs. Text
+therefore stays on MNN Q4.
 
 ## On-device agent (native)
 
@@ -544,7 +539,7 @@ that only prepares its inputs or measures it lives under `helpers/`.
 | `3rd/` | vendored MNN fork, host `MNNConvert`, arm64 `libMNN.so`, NeuroPilot device libraries |
 | `env.sh`, `agent-config.json` | the shared environment (`MTKG`, `OUT*`, `LOGS`, toolchain paths) and the agent runtime config |
 | `helpers/scripts/` | `00_clean_generated.sh` and `06`-`12`: build the runner, assemble assets, build the APK, deploy, run the demo, switch canvas, one-shot reproduction |
-| `helpers/STATUS.md`, `helpers/01`-`05`, `helpers/src`, `helpers/tools`, `helpers/tests`, `helpers/inputs`, `helpers/docs`, `helpers/profiles`, `helpers/minicpmv46` | the measurement and analysis report, checkpoint -> DLA/MNN conversion, host probes and evaluation harnesses, calibration images, manuals, and the leftover scripts of the MiniCPM-V reference demo |
+| `helpers/STATUS.md`, `helpers/01`-`05`, `helpers/src`, `helpers/tools`, `helpers/tests`, `helpers/inputs`, `helpers/docs`, `helpers/profiles` | the measurement and analysis report, checkpoint -> DLA/MNN conversion, host probes and evaluation harnesses, calibration images, manuals and profiles |
 | `docs/images/` | screenshots referenced by this README |
 
 See `helpers/README.md` for that half in detail. Generated artefacts stay at the
@@ -554,7 +549,7 @@ root (`out/`, `out-<W>x<H>/`, `logs/`, `work/`) whatever step produced them.
 
 | Path | Source |
 |---|---|
-| `mnn-src/` | phonevlm MNN fork (`gemma4` exporter + PLE runtime) from the MiniCPM-V reference tree |
+| `mnn-src/` | vendored MNN fork with the `gemma4` exporter and PLE runtime |
 | `mnn-host/` | host `MNNConvert` (only used by the Python export) |
 | `mnn-android/libMNN.so` | arm64 MNN runtime with LLM support |
 | `neuron/runtime/` | NeuroPilot 9.0.9 device libraries for `mt6899` |
